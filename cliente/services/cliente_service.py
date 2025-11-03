@@ -12,7 +12,6 @@ class ClienteService:
     def listar_clientes(self):
         resultado = self.api.get(self.endpoint)
         if resultado and 'clientes' in resultado:
-            st.success(f"✅ Encontrados {len(resultado['clientes'])} clientes na API")
             return resultado['clientes']
         else:
             st.error("❌ Nenhum cliente retornado da API")

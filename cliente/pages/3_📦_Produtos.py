@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from services.produto_service import ProdutoService
 from utils.permissions import can_access, can_edit, can_delete, can_create
+produto_service = ProdutoService()
 
 # ========== PERMISSÕES TEMPORÁRIAS ==========
 def can_access(cargo, modulo):
@@ -100,7 +101,7 @@ with tab1:
     
     if st.button("🔄 Atualizar Lista", key="atualizar_produtos"):
         try:
-            produtos = ProdutoService.listar_produtos()
+            produtos = produto_service.listar_produtos()
             if produtos and len(produtos) > 0:
                 df_produtos = pd.DataFrame(produtos)
                 st.dataframe(df_produtos, width='stretch')
@@ -142,7 +143,7 @@ with tab2:
                     }
                     
                     try:
-                        resultado = ProdutoService.criar_produto(produto_data)
+                        resultado = produto_service.criar_produto(produto_data)
                         if resultado:
                             st.success("✅ Produto cadastrado com sucesso!")
                             st.balloons()
@@ -157,7 +158,7 @@ with tab3:
     st.subheader("📊 Controle de Estoque")
     
     try:
-        produtos = ProdutoService.listar_produtos() or []
+        produtos = produto_service.listar_produtos() or []
         if produtos:
             # Produtos com estoque baixo
             estoque_baixo = [p for p in produtos if p.get('estoque', 0) < 10]
@@ -198,7 +199,7 @@ with tab4:  # ABA EDITAR PRODUTO
         st.warning("⚠️ Você não tem permissão para editar produtos")
     else:
         try:
-            produtos = ProdutoService.listar_produtos() or []
+            produtos = produto_service.listar_produtos() or []
             if produtos:
                 produto_selecionado = st.selectbox(
                     "Selecione o produto para editar:",
@@ -234,7 +235,7 @@ with tab4:  # ABA EDITAR PRODUTO
                                 }
                                 
                                 try:
-                                    resultado = ProdutoService.atualizar_produto(
+                                    resultado = produto_service.atualizar_produto(
                                         produto_selecionado['id'], 
                                         produto_data
                                     )
@@ -250,7 +251,7 @@ with tab4:  # ABA EDITAR PRODUTO
                             if can_delete(st.session_state.cargo, 'produtos'):
                                 if st.form_submit_button("🗑️ Excluir Produto", type="secondary"):
                                     try:
-                                        resultado = ProdutoService.excluir_produto(produto_selecionado['id'])
+                                        resultado = produto_service.excluir_produto(produto_selecionado['id'])
                                         if resultado:
                                             st.success("✅ Produto excluído com sucesso!")
                                             st.rerun()
