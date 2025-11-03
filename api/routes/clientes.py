@@ -41,10 +41,8 @@ async def listar_clientes():
         print("📝 [API] Listando clientes...")
         query = "SELECT * FROM clientes ORDER BY data_cadastro DESC"
         clientes = db.execute_query(query)
-        print(f"🔍 [API] Clientes encontrados: {clientes}")
         return {"clientes": clientes if clientes else []}
     except Exception as e:
-        print(f"❌ [API] Erro ao listar: {e}")
         return {"clientes": []}
     
 @router.put("/{cliente_id}", response_model=dict)
