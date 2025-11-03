@@ -83,10 +83,6 @@ with st.sidebar:
             st.switch_page("pages/7_⚙️_Configurações.py")
     
     st.divider()
-    
-    if st.button("🚪 Sair", use_container_width=True, type="secondary"):
-        st.session_state.logado = False
-        st.switch_page("main.py")
 
 # ========== HEADER ==========
 st.title("💸 Área Financeira")

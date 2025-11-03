@@ -64,23 +64,31 @@ with st.sidebar:
     if st.button("📊 Dashboard", use_container_width=True):
         st.switch_page("pages/1_🏠_Dashboard.py")
     
-    if st.button("👥 Clientes", use_container_width=True):
-        st.switch_page("pages/2_👥_Clientes.py")
+    if can_access(st.session_state.cargo, 'clientes'):
+        if st.button("👥 Clientes", use_container_width=True):
+            st.switch_page("pages/2_👥_Clientes.py")
     
-    if st.button("📦 Produtos", use_container_width=True, type="primary"):
-        st.rerun()
+    if can_access(st.session_state.cargo, 'produtos'):
+        if st.button("📦 Produtos", use_container_width=True, type="primary"):
+            st.rerun()
     
-    if st.button("💰 Vendas", use_container_width=True):
-        st.switch_page("pages/4_💰_Vendas.py")
+    if can_access(st.session_state.cargo, 'vendas'):
+        if st.button("💰 Vendas", use_container_width=True):
+            st.switch_page("pages/4_💰_Vendas.py")
     
-    if st.button("💸 Financeiro", use_container_width=True):
-        st.switch_page("pages/5_💸_Financeiro.py")
+    if can_access(st.session_state.cargo, 'financeiro'):
+        if st.button("💸 Financeiro", use_container_width=True):
+            st.switch_page("pages/5_💸_Financeiro.py")
+    
+    if can_access(st.session_state.cargo, 'fiscal'):
+        if st.button("📋 Fiscal", use_container_width=True):
+            st.switch_page("pages/6_📋_Fiscal.py")
+    
+    if can_access(st.session_state.cargo, 'configuracoes'):
+        if st.button("⚙️ Configurações", use_container_width=True):
+            st.switch_page("pages/7_⚙️_Configurações.py")
     
     st.divider()
-    
-    if st.button("🚪 Sair", use_container_width=True, type="secondary"):
-        st.session_state.logado = False
-        st.switch_page("main.py")
 
 # ========== HEADER ==========
 st.title("📦 Gestão de Produtos")

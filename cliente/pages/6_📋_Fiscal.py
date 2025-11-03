@@ -83,10 +83,6 @@ with st.sidebar:
     
     st.divider()
     
-    if st.button("🚪 Sair", use_container_width=True, type="secondary"):
-        st.session_state.logado = False
-        st.switch_page("main.py")
-
 # ========== HEADER ==========
 st.title("📋 Módulo Fiscal")
 st.write(f"**Usuário:** {st.session_state.usuario} | **Cargo:** {st.session_state.cargo}")
