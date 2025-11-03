@@ -39,13 +39,16 @@ class ProdutoService:
     
     def atualizar_produto(self, produto_id, produto_data):
         try:
-            st.write("🔍 Debug - Dados enviados para API:", produto_data)
             resultado = self.api.put(f"/produtos/{produto_id}", produto_data)
-            st.write("🔍 Debug - Resposta da API:", resultado)
             return resultado
         except Exception as e:
             st.error(f"❌ Erro ao atualizar produto: {e}")
             return None
     
     def excluir_produto(self, produto_id):
-        return self.api.delete(f"/produtos/{produto_id}")
+        try:
+            resultado = self.api.delete(f"/produtos/{produto_id}")
+            return resultado
+        except Exception as e:
+            st.error(f"❌ Erro ao excluir produto: {e}")
+            return None
