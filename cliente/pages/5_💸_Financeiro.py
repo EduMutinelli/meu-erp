@@ -158,18 +158,17 @@ with tab1:
                 st.write(f"R$ {registro['valor']:,.2f}")
             
             with col6:
-                st.subheader("🗑️")
 
-                if can_delete(st.session_state.cargo, 'financeiro'):  # ou 'fiscal'
+                if can_delete(st.session_state.cargo, 'financeiro'):  
                     col1, col2 = st.columns(2)
                     
                     with col1:
-                        if st.button("🧹 Limpar Dados de Teste", type="secondary"):
-                            st.warning("Esta ação irá limpar todos os dados de teste")
+                        if st.button("🗑️", type="secondary", help="Excluir"):
+                            st.warning("Esta ação irá deletar")
                             # Implementar lógica de delete aqui
                             
                     with col2:
-                        if st.button("📊 Resetar Estatísticas", type="secondary"):
+                        if st.button("📊", type="secondary", help="Resetar estatísticas"):
                             st.info("Estatísticas resetadas")
                             st.rerun()
         

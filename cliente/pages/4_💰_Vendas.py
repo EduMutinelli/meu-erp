@@ -23,12 +23,6 @@ def can_delete(cargo, modulo):
 def can_create(cargo, modulo):
     return can_access(cargo, modulo)
 
-# ========== SERVIÇOS LOCAIS ==========
-from services.local_service import LocalVendaService, LocalClienteService, LocalProdutoService
-venda_service = LocalVendaService()
-cliente_service = LocalClienteService()
-produto_service = LocalProdutoService()
-
 # ========== CONFIGURAÇÃO ==========
 st.set_page_config(
     page_title="Vendas - ERP",
