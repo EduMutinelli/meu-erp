@@ -9,7 +9,7 @@ class ProdutoService:
         return self.api.post("/produtos/", produto_data)
     
     def listar_produtos(self):
-        resultado = self.api.get("/produtos/") 
+        resultado = self.api.get(self.endpoint)
         if resultado and 'produtos' in resultado:
             st.success(f"✅ Encontrados {len(resultado['produtos'])} produtos")
             return resultado['produtos']
