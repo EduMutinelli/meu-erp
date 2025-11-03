@@ -1,0 +1,15 @@
+# Ignorar estas pastas
+api/
+__pycache__/
+venv/
+logs/
+data/
+
+# Ignorar estes arquivos
+*.pyc
+*.pyo
+*.pyd
+.env
+.DS_Store
+
+# MANTER tudo o resto (cliente/, requirements/, *.bat, etc.)
