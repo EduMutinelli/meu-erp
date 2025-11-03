@@ -1,8 +1,27 @@
 import streamlit as st
 import pandas as pd
+
+# ========== PERMISSÕES TEMPORÁRIAS ==========
+def can_access(cargo, modulo):
+    permissoes = {
+        'ADM': ['clientes', 'produtos', 'vendas', 'financeiro', 'fiscal', 'configuracoes'],
+        'financeiro': ['clientes', 'produtos', 'vendas', 'financeiro'],
+        'usuario': ['produtos', 'vendas']
+    }
+    return cargo in permissoes and modulo in permissoes[cargo]
+
+def can_edit(cargo, modulo):
+    return can_access(cargo, modulo)
+
+def can_delete(cargo, modulo):
+    return cargo == 'ADM'
+
+def can_create(cargo, modulo):
+    return can_access(cargo, modulo)
+
+# ========== SERVIÇO LOCAL ==========
 from services.local_service import LocalProdutoService
 produto_service = LocalProdutoService()
-
 
 # ========== CONFIGURAÇÃO ==========
 st.set_page_config(
