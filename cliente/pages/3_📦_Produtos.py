@@ -195,61 +195,93 @@ with tab3:
     else:
         st.info("👆 Clique no botão para carregar o estoque")
     
-with tab4:  # ABA EDITAR PRODUTO
+with tab4:
     st.subheader("✏️ Editar Produto")
     
     if not can_edit(st.session_state.cargo, 'produtos'):
         st.warning("⚠️ Você não tem permissão para editar produtos")
     else:
-        if st.button("🔄 Carregar Produtos para Edição", key="carregar_edicao"):
+        # Carrega produtos uma vez e mantém em session_state
+        if 'produtos_edicao' not in st.session_state:
+            st.session_state.produtos_edicao = None
+        
+        if st.button("🔄 Carregar Produtos", key="carregar_edicao") or st.session_state.produtos_edicao is not None:
             try:
-                produtos = produto_service.listar_produtos()
+                if st.session_state.produtos_edicao is None:
+                    produtos = produto_service.listar_produtos()
+                    st.session_state.produtos_edicao = produtos
+                else:
+                    produtos = st.session_state.produtos_edicao
+                
                 if produtos:
+                    # Selectbox mantém o estado
+                    if 'produto_selecionado_id' not in st.session_state:
+                        st.session_state.produto_selecionado_id = produtos[0]['id']
+                    
                     produto_selecionado = st.selectbox(
                         "Selecione o produto para editar:",
                         options=produtos,
                         format_func=lambda x: f"{x['id']} - {x['nome']} (R$ {x['preco']})",
-                        key="select_produto_editar"
+                        key="select_produto_editar",
+                        index=next((i for i, p in enumerate(produtos) 
+                                  if p['id'] == st.session_state.produto_selecionado_id), 0)
                     )
                     
+                    # Atualiza o ID selecionado
+                    st.session_state.produto_selecionado_id = produto_selecionado['id']
+                    
                     if produto_selecionado:
-                        with st.form("form_editar_produto"):
+                        st.divider()
+                        st.write(f"**Editando:** {produto_selecionado['nome']}")
+                        
+                        with st.form("form_editar_produto", clear_on_submit=False):
                             col1, col2 = st.columns(2)
                             
                             with col1:
-                                nome_edit = st.text_input("Nome", value=produto_selecionado['nome'])
-                                preco_edit = st.number_input("Preço", min_value=0.0, value=float(produto_selecionado['preco']), step=0.01, format="%.2f")
+                                nome_edit = st.text_input("Nome*", value=produto_selecionado['nome'])
+                                preco_edit = st.number_input("Preço*", min_value=0.0, 
+                                                           value=float(produto_selecionado['preco']), 
+                                                           step=0.01, format="%.2f")
                             
                             with col2:
-                                estoque_edit = st.number_input("Estoque", min_value=0, value=produto_selecionado['estoque'])
-                                categoria_edit = st.text_input("Categoria", value=produto_selecionado.get('categoria', ''))
+                                estoque_edit = st.number_input("Estoque*", min_value=0, 
+                                                             value=produto_selecionado['estoque'])
+                                categoria_edit = st.text_input("Categoria", 
+                                                             value=produto_selecionado.get('categoria', ''))
                             
-                            descricao_edit = st.text_area("Descrição", value=produto_selecionado.get('descricao', ''))
+                            descricao_edit = st.text_area("Descrição", 
+                                                        value=produto_selecionado.get('descricao', ''))
                             
-                            col_btn1, col_btn2 = st.columns(2)
+                            col_btn1, col_btn2, col_btn3 = st.columns([2, 2, 1])
                             
                             with col_btn1:
-                                if st.form_submit_button("💾 Atualizar Produto"):
-                                    produto_data = {
-                                        "nome": nome_edit.strip(),
-                                        "preco": float(preco_edit),
-                                        "estoque": int(estoque_edit),
-                                        "categoria": categoria_edit.strip() if categoria_edit else None,
-                                        "descricao": descricao_edit.strip() if descricao_edit else None
-                                    }
-                                    
-                                    try:
-                                        resultado = produto_service.atualizar_produto(
-                                            produto_selecionado['id'], 
-                                            produto_data
-                                        )
-                                        if resultado:
-                                            st.success("✅ Produto atualizado com sucesso!")
-                                            st.rerun()
-                                        else:
-                                            st.error("❌ Erro ao atualizar produto")
-                                    except Exception as e:
-                                        st.error(f"❌ Erro: {e}")
+                                if st.form_submit_button("💾 Salvar Alterações", type="primary"):
+                                    if nome_edit.strip():
+                                        produto_data = {
+                                            "nome": nome_edit.strip(),
+                                            "preco": float(preco_edit),
+                                            "estoque": int(estoque_edit),
+                                            "categoria": categoria_edit.strip() if categoria_edit else None,
+                                            "descricao": descricao_edit.strip() if descricao_edit else None
+                                        }
+                                        
+                                        try:
+                                            resultado = produto_service.atualizar_produto(
+                                                produto_selecionado['id'], 
+                                                produto_data
+                                            )
+                                            if resultado:
+                                                st.success("✅ Produto atualizado com sucesso!")
+                                                # Limpa o cache para recarregar dados atualizados
+                                                st.session_state.produtos_edicao = None
+                                                st.session_state.produto_selecionado_id = None
+                                                st.rerun()
+                                            else:
+                                                st.error("❌ Erro ao atualizar produto")
+                                        except Exception as e:
+                                            st.error(f"❌ Erro: {e}")
+                                    else:
+                                        st.error("❌ Nome é obrigatório!")
                             
                             with col_btn2:
                                 if can_delete(st.session_state.cargo, 'produtos'):
@@ -258,13 +290,22 @@ with tab4:  # ABA EDITAR PRODUTO
                                             resultado = produto_service.excluir_produto(produto_selecionado['id'])
                                             if resultado:
                                                 st.success("✅ Produto excluído com sucesso!")
+                                                st.session_state.produtos_edicao = None
+                                                st.session_state.produto_selecionado_id = None
                                                 st.rerun()
                                             else:
                                                 st.error("❌ Erro ao excluir produto")
                                         except Exception as e:
                                             st.error(f"❌ Erro: {e}")
+                            
+                            with col_btn3:
+                                if st.form_submit_button("🔄 Cancelar"):
+                                    st.session_state.produtos_edicao = None
+                                    st.session_state.produto_selecionado_id = None
+                                    st.rerun()
                 else:
                     st.info("📝 Nenhum produto cadastrado para editar")
+                    
             except Exception as e:
                 st.error(f"❌ Erro ao carregar produtos: {e}")
         else:
