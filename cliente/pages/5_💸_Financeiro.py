@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 from datetime import date
-from utils.permissions import can_access, can_create, can_edit, can_delete
+from services.venda_service import VendaService
+from utils.permissions import can_access, can_create, can_delete
 
 # ========== CONFIGURAÇÃO ==========
 st.set_page_config(
@@ -157,9 +158,20 @@ with tab1:
                 st.write(f"R$ {registro['valor']:,.2f}")
             
             with col6:
-                if can_delete(st.session_state.cargo, 'financeiro'):
-                    if st.button("🗑️", key=f"del_fin_{registro['ID']}"):
-                        st.warning("Funcionalidade em desenvolvimento")
+                st.subheader("🗑️")
+
+                if can_delete(st.session_state.cargo, 'financeiro'):  # ou 'fiscal'
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        if st.button("🧹 Limpar Dados de Teste", type="secondary"):
+                            st.warning("Esta ação irá limpar todos os dados de teste")
+                            # Implementar lógica de delete aqui
+                            
+                    with col2:
+                        if st.button("📊 Resetar Estatísticas", type="secondary"):
+                            st.info("Estatísticas resetadas")
+                            st.rerun()
         
         # Total filtrado
         total_filtrado = sum(r['valor'] for r in registros_filtrados if r['tipo'] == 'RECEITA') - \

@@ -1,5 +1,9 @@
 import streamlit as st
 import pandas as pd
+from services.venda_service import VendaService
+from services.cliente_service import ClienteService
+from services.produto_service import ProdutoService
+from utils.permissions import can_access, can_create
 
 # ========== PERMISSÕES TEMPORÁRIAS ==========
 def can_access(cargo, modulo):

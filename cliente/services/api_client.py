@@ -1,53 +1,39 @@
-# ARQUIVO: cliente/services/api_client.py
-
 import requests
 import streamlit as st
+import os
 
 class APIClient:
     def __init__(self):
-        self.base_url = st.secrets["api_config"]["API_URL"]
-        print(f"🔗 [API CLIENT] URL base: {self.base_url}")
+        # Pega a URL da API dos secrets do Streamlit Cloud
+        self.base_url = st.secrets.get("API_URL", "http://localhost:8001/api/v1")
+        st.write(f"🔍 [DEBUG] URL da API: {self.base_url}")
     
-    def post(self, endpoint, data):
+    def _request(self, method, endpoint, **kwargs):
         try:
-            print(f"📤 [API CLIENT] POST {endpoint} - Dados: {data}")
-            response = requests.post(f"{self.base_url}{endpoint}", json=data)
-            response.raise_for_status()
-            result = response.json()
-            print(f"📥 [API CLIENT] Resposta: {result}")
-            return result
-        except requests.exceptions.RequestException as e:
-            st.error(f"Erro na API: {e}")
+            url = f"{self.base_url}{endpoint}"
+            response = requests.request(method, url, **kwargs)
+            
+            if response.status_code == 200:
+                return response.json()
+            else:
+                st.error(f"Erro na API: {response.status_code}")
+                return None
+                
+        except requests.exceptions.ConnectionError:
+            st.error("❌ API não disponível. Verifique se a API está online.")
+            return None
+        except Exception as e:
+            st.error(f"❌ Erro de conexão: {e}")
             return None
     
     def get(self, endpoint):
-        try:
-            print(f"📤 [API CLIENT] GET {endpoint}")
-            response = requests.get(f"{self.base_url}{endpoint}")
-            response.raise_for_status()
-            result = response.json()
-            print(f"📥 [API CLIENT] Resposta: {result}")
-            return result
-        except requests.exceptions.RequestException as e:
-            st.error(f"Erro na API: {e}")
-            return None
+        return self._request("GET", endpoint)
+    
+    def post(self, endpoint, data):
+        return self._request("POST", endpoint, json=data)
     
     def put(self, endpoint, data):
-        try:
-            print(f"📤 [API CLIENT] PUT {endpoint}")
-            response = requests.put(f"{self.base_url}{endpoint}", json=data)
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            st.error(f"Erro na API: {e}")
-            return None
+        return self._request("PUT", endpoint, json=data)
     
     def delete(self, endpoint):
-        try:
-            print(f"📤 [API CLIENT] DELETE {endpoint}")
-            response = requests.delete(f"{self.base_url}{endpoint}")
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            st.error(f"Erro na API: {e}")
-            return None
+        return self._request("DELETE", endpoint)

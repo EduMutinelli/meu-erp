@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+from services.produto_service import ProdutoService
+from utils.permissions import can_access, can_edit, can_delete, can_create
 
 # ========== PERMISSÕES TEMPORÁRIAS ==========
 def can_access(cargo, modulo):
@@ -18,10 +20,6 @@ def can_delete(cargo, modulo):
 
 def can_create(cargo, modulo):
     return can_access(cargo, modulo)
-
-# ========== SERVIÇO LOCAL ==========
-from services.local_service import LocalProdutoService
-produto_service = LocalProdutoService()
 
 # ========== CONFIGURAÇÃO ==========
 st.set_page_config(
@@ -95,14 +93,14 @@ st.title("📦 Gestão de Produtos")
 st.write(f"**Usuário:** {st.session_state.usuario} | **Cargo:** {st.session_state.cargo}")
 
 # ========== ABAS ==========
-tab1, tab2, tab3 = st.tabs(["📋 Listar Produtos", "➕ Novo Produto", "📊 Estoque"])
+tab1, tab2, tab3, tab4 = st.tabs(["📋 Listar Produtos", "➕ Novo Produto", "📊 Estoque", "✏️ Editar Produto"])
 
 with tab1:
     st.subheader("Produtos Cadastrados")
     
     if st.button("🔄 Atualizar Lista", key="atualizar_produtos"):
         try:
-            produtos = produto_service.listar_produtos()
+            produtos = ProdutoService.listar_produtos()
             if produtos and len(produtos) > 0:
                 df_produtos = pd.DataFrame(produtos)
                 st.dataframe(df_produtos, width='stretch')
@@ -144,7 +142,7 @@ with tab2:
                     }
                     
                     try:
-                        resultado = produto_service.criar_produto(produto_data)
+                        resultado = ProdutoService.criar_produto(produto_data)
                         if resultado:
                             st.success("✅ Produto cadastrado com sucesso!")
                             st.balloons()
@@ -159,7 +157,7 @@ with tab3:
     st.subheader("📊 Controle de Estoque")
     
     try:
-        produtos = produto_service.listar_produtos() or []
+        produtos = ProdutoService.listar_produtos() or []
         if produtos:
             # Produtos com estoque baixo
             estoque_baixo = [p for p in produtos if p.get('estoque', 0) < 10]
@@ -192,6 +190,78 @@ with tab3:
             st.info("Nenhum produto cadastrado")
     except Exception as e:
         st.error(f"Erro ao carregar estoque: {e}")
+    
+with tab4:  # ABA EDITAR PRODUTO
+    st.subheader("✏️ Editar Produto")
+    
+    if not can_edit(st.session_state.cargo, 'produtos'):
+        st.warning("⚠️ Você não tem permissão para editar produtos")
+    else:
+        try:
+            produtos = ProdutoService.listar_produtos() or []
+            if produtos:
+                produto_selecionado = st.selectbox(
+                    "Selecione o produto para editar:",
+                    options=produtos,
+                    format_func=lambda x: f"{x['id']} - {x['nome']} (R$ {x['preco']})",
+                    key="select_produto_editar"
+                )
+                
+                if produto_selecionado:
+                    with st.form("form_editar_produto"):
+                        col1, col2 = st.columns(2)
+                        
+                        with col1:
+                            nome_edit = st.text_input("Nome", value=produto_selecionado['nome'])
+                            preco_edit = st.number_input("Preço", min_value=0.0, value=float(produto_selecionado['preco']), step=0.01, format="%.2f")
+                        
+                        with col2:
+                            estoque_edit = st.number_input("Estoque", min_value=0, value=produto_selecionado['estoque'])
+                            categoria_edit = st.text_input("Categoria", value=produto_selecionado.get('categoria', ''))
+                        
+                        descricao_edit = st.text_area("Descrição", value=produto_selecionado.get('descricao', ''))
+                        
+                        col_btn1, col_btn2 = st.columns(2)
+                        
+                        with col_btn1:
+                            if st.form_submit_button("💾 Atualizar Produto"):
+                                produto_data = {
+                                    "nome": nome_edit.strip(),
+                                    "preco": float(preco_edit),
+                                    "estoque": int(estoque_edit),
+                                    "categoria": categoria_edit.strip() if categoria_edit else None,
+                                    "descricao": descricao_edit.strip() if descricao_edit else None
+                                }
+                                
+                                try:
+                                    resultado = ProdutoService.atualizar_produto(
+                                        produto_selecionado['id'], 
+                                        produto_data
+                                    )
+                                    if resultado:
+                                        st.success("✅ Produto atualizado com sucesso!")
+                                        st.rerun()
+                                    else:
+                                        st.error("❌ Erro ao atualizar produto")
+                                except Exception as e:
+                                    st.error(f"❌ Erro: {e}")
+                        
+                        with col_btn2:
+                            if can_delete(st.session_state.cargo, 'produtos'):
+                                if st.form_submit_button("🗑️ Excluir Produto", type="secondary"):
+                                    try:
+                                        resultado = ProdutoService.excluir_produto(produto_selecionado['id'])
+                                        if resultado:
+                                            st.success("✅ Produto excluído com sucesso!")
+                                            st.rerun()
+                                        else:
+                                            st.error("❌ Erro ao excluir produto")
+                                    except Exception as e:
+                                        st.error(f"❌ Erro: {e}")
+            else:
+                st.info("📝 Nenhum produto cadastrado para editar")
+        except Exception as e:
+            st.error(f"❌ Erro ao carregar produtos: {e}")
 
 # ========== NAVEGAÇÃO ==========
 st.divider()

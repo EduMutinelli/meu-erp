@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+from services.cliente_service import ClienteService
+cliente_service = ClienteService()
 
 # ========== PERMISSÕES TEMPORÁRIAS ==========
 def can_access(cargo, modulo):
@@ -18,10 +20,6 @@ def can_delete(cargo, modulo):
 
 def can_create(cargo, modulo):
     return can_access(cargo, modulo)
-
-# ========== SERVIÇO LOCAL ==========
-from services.local_service import LocalClienteService
-cliente_service = LocalClienteService()
 
 # ========== CONFIGURAÇÃO ==========
 st.set_page_config(

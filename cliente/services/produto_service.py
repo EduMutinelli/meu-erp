@@ -1,5 +1,3 @@
-# ARQUIVO: cliente/services/produto_service.py
-
 from .api_client import APIClient
 
 class ProdutoService:

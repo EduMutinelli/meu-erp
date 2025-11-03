@@ -1,24 +1,26 @@
-# ARQUIVO: cliente/services/cliente_service.py
-
 from .api_client import APIClient
+import streamlit as st
 
 class ClienteService:
     def __init__(self):
         self.api = APIClient()
-    
+        self.endpoint = "/clientes"
+
     def criar_cliente(self, cliente_data):
         return self.api.post("/clientes/", cliente_data)
     
     def listar_clientes(self):
-        response = self.api.get("/clientes/")
-        print(f"🔍 [CLIENTE SERVICE] Resposta da API: {response}")  # Debug
-        # ✅ CORREÇÃO: A API retorna {"clientes": [...]}
-        if response and "clientes" in response:
-            clientes = response["clientes"]
-            # Garantir que é uma lista
-            return clientes if isinstance(clientes, list) else []
-        return []  # Retorna lista vazia em caso de erro
-    
+        st.write("🔍 [DEBUG] Chamando API para listar clientes...")
+        resultado = self.api.get(self.endpoint)
+        st.write(f"🔍 [DEBUG] Resposta da API: {resultado}")
+        
+        if resultado and 'clientes' in resultado:
+            st.success(f"✅ Encontrados {len(resultado['clientes'])} clientes na API")
+            return resultado['clientes']
+        else:
+            st.error("❌ Nenhum cliente retornado da API")
+            return []
+        
     def buscar_cliente(self, cliente_id):
         response = self.api.get(f"/clientes/{cliente_id}")
         return response.get("cliente") if response else None
@@ -28,3 +30,5 @@ class ClienteService:
     
     def excluir_cliente(self, cliente_id):
         return self.api.delete(f"/clientes/{cliente_id}")
+        
+        

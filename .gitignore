@@ -1,9 +1,9 @@
 # Ignorar estas pastas
-api/
 __pycache__/
 venv/
 logs/
 data/
+temp_api/
 
 # Ignorar estes arquivos
 *.pyc
@@ -13,3 +13,5 @@ data/
 .DS_Store
 
 # MANTER tudo o resto (cliente/, requirements/, *.bat, etc.)
+
+git remote add origin https://github.com/EduMutinelli/meu-erp.git
