@@ -1,5 +1,25 @@
 import streamlit as st
 import pandas as pd
+
+# ========== PERMISSÕES TEMPORÁRIAS ==========
+def can_access(cargo, modulo):
+    permissoes = {
+        'ADM': ['clientes', 'produtos', 'vendas', 'financeiro', 'fiscal', 'configuracoes'],
+        'financeiro': ['clientes', 'produtos', 'vendas', 'financeiro'],
+        'usuario': ['produtos', 'vendas']
+    }
+    return cargo in permissoes and modulo in permissoes[cargo]
+
+def can_edit(cargo, modulo):
+    return can_access(cargo, modulo)
+
+def can_delete(cargo, modulo):
+    return cargo == 'ADM'
+
+def can_create(cargo, modulo):
+    return can_access(cargo, modulo)
+
+# ========== SERVIÇO LOCAL ==========
 from services.local_service import LocalClienteService
 cliente_service = LocalClienteService()
 
@@ -14,13 +34,8 @@ st.set_page_config(
 # ========== ESCONDER MENU LATERAL PADRÃO ==========
 st.markdown("""
 <style>
-    /* Esconder o menu lateral padrão do Streamlit */
     .css-1d391kg {display: none !important;}
-    
-    /* Esconder qualquer outro elemento do menu padrão */
     [data-testid="stSidebarNav"] {display: none !important;}
-    
-    /* Garantir que nosso menu personalizado fique visível */
     section[data-testid="stSidebar"] {
         display: block !important;
     }
@@ -37,10 +52,7 @@ if not can_access(st.session_state.cargo, 'clientes'):
     st.error("❌ Você não tem permissão para acessar este módulo!")
     st.stop()
 
-# ========== SERVIÇO ==========
-cliente_service = ClienteService()
-
-# ========== MENU LATERAL ==========
+# ========== MENU LATERAL PERSONALIZADO ==========
 with st.sidebar:
     st.title("🏢 ERP Sistema")
     st.write(f"**Usuário:** {st.session_state.usuario}")
@@ -49,37 +61,26 @@ with st.sidebar:
     
     st.subheader("🧭 Navegação")
     
-    # Menu baseado nas permissões
     if st.button("📊 Dashboard", use_container_width=True):
         st.switch_page("pages/1_🏠_Dashboard.py")
     
-    if can_access(st.session_state.cargo, 'clientes'):
-        if st.button("👥 Clientes", use_container_width=True, type="primary"):
-            st.rerun()
+    if st.button("👥 Clientes", use_container_width=True, type="primary"):
+        st.rerun()
     
-    if can_access(st.session_state.cargo, 'produtos'):
-        if st.button("📦 Produtos", use_container_width=True):
-            st.switch_page("pages/3_📦_Produtos.py")
+    if st.button("📦 Produtos", use_container_width=True):
+        st.switch_page("pages/3_📦_Produtos.py")
     
-    if can_access(st.session_state.cargo, 'vendas'):
-        if st.button("💰 Vendas", use_container_width=True):
-            st.switch_page("pages/4_💰_Vendas.py")
+    if st.button("💰 Vendas", use_container_width=True):
+        st.switch_page("pages/4_💰_Vendas.py")
     
-    if can_access(st.session_state.cargo, 'financeiro'):
-        if st.button("💸 Financeiro", use_container_width=True):
-            st.switch_page("pages/5_💸_Financeiro.py")
-    
-    if can_access(st.session_state.cargo, 'fiscal'):
-        if st.button("📋 Fiscal", use_container_width=True):
-            st.switch_page("pages/6_📋_Fiscal.py")
-    
-    if can_access(st.session_state.cargo, 'configuracoes'):
-        if st.button("⚙️ Configurações", use_container_width=True):
-            st.switch_page("pages/7_⚙️_Configurações.py")
+    if st.button("💸 Financeiro", use_container_width=True):
+        st.switch_page("pages/5_💸_Financeiro.py")
     
     st.divider()
     
-    
+    if st.button("🚪 Sair", use_container_width=True, type="secondary"):
+        st.session_state.logado = False
+        st.switch_page("main.py")
 
 # ========== HEADER ==========
 st.title("👥 Gestão de Clientes")
@@ -242,4 +243,3 @@ col1, col2, col3 = st.columns(3)
 with col2:
     if st.button("🏠 Voltar ao Dashboard", use_container_width=True):
         st.switch_page("pages/1_🏠_Dashboard.py")
-
