@@ -10,9 +10,7 @@ class ClienteService:
         return self.api.post("/clientes/", cliente_data)
     
     def listar_clientes(self):
-        st.write("🔍 [DEBUG] Chamando API para listar clientes...")
         resultado = self.api.get(self.endpoint)
-        st.write(f"🔍 [DEBUG] Resposta da API: {resultado}")
         
         if resultado and 'clientes' in resultado:
             st.success(f"✅ Encontrados {len(resultado['clientes'])} clientes na API")

@@ -6,7 +6,6 @@ class APIClient:
     def __init__(self):
         # Pega a URL da API dos secrets do Streamlit Cloud
         self.base_url = st.secrets.get("API_URL", "http://localhost:8001/api/v1")
-        st.write(f"🔍 [DEBUG] URL da API: {self.base_url}")
     
     def _request(self, method, endpoint, **kwargs):
         try:
