@@ -36,13 +36,8 @@ st.set_page_config(
 # ========== ESCONDER MENU LATERAL PADRÃO ==========
 st.markdown("""
 <style>
-    /* Esconder o menu lateral padrão do Streamlit */
     .css-1d391kg {display: none !important;}
-    
-    /* Esconder qualquer outro elemento do menu padrão */
     [data-testid="stSidebarNav"] {display: none !important;}
-    
-    /* Garantir que nosso menu personalizado fique visível */
     section[data-testid="stSidebar"] {
         display: block !important;
     }
@@ -59,11 +54,6 @@ if not can_access(st.session_state.cargo, 'vendas'):
     st.error("❌ Você não tem permissão para acessar este módulo!")
     st.stop()
 
-# ========== SERVIÇOS ==========
-venda_service = VendaService()
-cliente_service = ClienteService()
-produto_service = ProdutoService()
-
 # ========== MENU LATERAL PERSONALIZADO ==========
 with st.sidebar:
     st.title("🏢 ERP Sistema")
@@ -73,33 +63,20 @@ with st.sidebar:
     
     st.subheader("🧭 Navegação")
     
-    # Menu baseado nas permissões
     if st.button("📊 Dashboard", use_container_width=True):
         st.switch_page("pages/1_🏠_Dashboard.py")
     
-    if can_access(st.session_state.cargo, 'clientes'):
-        if st.button("👥 Clientes", use_container_width=True):
-            st.switch_page("pages/2_👥_Clientes.py")
+    if st.button("👥 Clientes", use_container_width=True):
+        st.switch_page("pages/2_👥_Clientes.py")
     
-    if can_access(st.session_state.cargo, 'produtos'):
-        if st.button("📦 Produtos", use_container_width=True):
-            st.switch_page("pages/3_📦_Produtos.py")
+    if st.button("📦 Produtos", use_container_width=True):
+        st.switch_page("pages/3_📦_Produtos.py")
     
-    if can_access(st.session_state.cargo, 'vendas'):
-        if st.button("💰 Vendas", use_container_width=True, type="primary"):
-            st.rerun()
+    if st.button("💰 Vendas", use_container_width=True, type="primary"):
+        st.rerun()
     
-    if can_access(st.session_state.cargo, 'financeiro'):
-        if st.button("💸 Financeiro", use_container_width=True):
-            st.switch_page("pages/5_💸_Financeiro.py")
-    
-    if can_access(st.session_state.cargo, 'fiscal'):
-        if st.button("📋 Fiscal", use_container_width=True):
-            st.switch_page("pages/6_📋_Fiscal.py")
-    
-    if can_access(st.session_state.cargo, 'configuracoes'):
-        if st.button("⚙️ Configurações", use_container_width=True):
-            st.switch_page("pages/7_⚙️_Configurações.py")
+    if st.button("💸 Financeiro", use_container_width=True):
+        st.switch_page("pages/5_💸_Financeiro.py")
     
     st.divider()
     
@@ -128,13 +105,19 @@ with tab1:
                 # Formatar dados para exibição
                 vendas_formatadas = []
                 for venda in vendas:
-                    total_float = float(venda['total'])
+                    # Buscar nome do cliente
+                    cliente_nome = "Cliente não encontrado"
+                    for cliente in cliente_service.listar_clientes():
+                        if cliente['id'] == venda['cliente_id']:
+                            cliente_nome = cliente['nome']
+                            break
+                    
                     vendas_formatadas.append({
                         "ID": venda['id'],
-                        "Cliente": venda.get('cliente_nome', 'N/A'),
-                        "Data": venda['data_venda'][:10],
-                        "Total": f"R$ {total_float:.2f}",
-                        "Observação": venda.get('observacao', '')
+                        "Cliente": cliente_nome,
+                        "Data": venda['data_venda'][:10] if 'data_venda' in venda else 'N/A',
+                        "Total": f"R$ {venda.get('valor_total', 0):.2f}",
+                        "Itens": len([item for item in venda.get('itens', [])]) if 'itens' in venda else 1
                     })
                 
                 st.dataframe(vendas_formatadas, width='stretch')
@@ -246,14 +229,11 @@ with tab2:
                             if cliente_selecionado and st.session_state.itens_venda:
                                 venda_data = {
                                     "cliente_id": cliente_selecionado['id'],
-                                    "itens": [
-                                        {
-                                            "produto_id": item['produto_id'],
-                                            "quantidade": item['quantidade'],
-                                            "preco_unitario": item['preco_unitario']
-                                        } for item in st.session_state.itens_venda
-                                    ],
-                                    "observacao": observacao.strip() if observacao else None
+                                    "produto_id": st.session_state.itens_venda[0]['produto_id'],  # Pega o primeiro produto
+                                    "quantidade": sum(item['quantidade'] for item in st.session_state.itens_venda),
+                                    "data_venda": pd.Timestamp.now().isoformat(),
+                                    "desconto": 0,
+                                    "observacoes": observacao.strip() if observacao else None
                                 }
                                 
                                 try:
@@ -282,4 +262,3 @@ col1, col2, col3 = st.columns(3)
 with col2:
     if st.button("🏠 Voltar ao Dashboard", use_container_width=True):
         st.switch_page("pages/1_🏠_Dashboard.py")
-
