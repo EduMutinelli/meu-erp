@@ -234,7 +234,6 @@ with tab4:
                         st.divider()
                         st.write(f"**Editando:** {produto_selecionado['nome']}")
                         
-                        # FORMULÁRIO DE EDIÇÃO (apenas para editar)
                         with st.form("form_editar_produto", clear_on_submit=False):
                             col1, col2 = st.columns(2)
                             
@@ -253,8 +252,20 @@ with tab4:
                             descricao_edit = st.text_area("Descrição", 
                                                         value=produto_selecionado.get('descricao', ''))
                             
-                            submitted_edit = st.form_submit_button("💾 Salvar Alterações", type="primary")
+                            col_btn1, col_btn2 = st.columns(2)
                             
+                            with col_btn1:
+                                submitted_edit = st.form_submit_button("💾 Salvar Alterações", 
+                                                                     type="primary", 
+                                                                     use_container_width=True)
+                            
+                            with col_btn2:
+                                if can_delete(st.session_state.cargo, 'produtos'):
+                                    submitted_delete = st.form_submit_button("🗑️ Excluir Produto", 
+                                                                           type="secondary", 
+                                                                           use_container_width=True)
+                            
+                            # Processa SALVAR
                             if submitted_edit:
                                 if nome_edit.strip():
                                     produto_data = {
@@ -282,42 +293,20 @@ with tab4:
                                         st.error(f"❌ Erro: {e}")
                                 else:
                                     st.error("❌ Nome é obrigatório!")
-                        
-                        # BOTÃO DE EXCLUIR SEPARADO (fora do formulário de edição)
-                        if can_delete(st.session_state.cargo, 'produtos'):
-                            st.divider()
-                            st.write("**Zona de Perigo**")
                             
-                            col_excluir, col_cancelar = st.columns(2)
-                            
-                            with col_excluir:
-                                if st.button("🗑️ Excluir Produto", type="secondary", key="btn_excluir"):
-                                    # Confirmação antes de excluir
-                                    with st.expander("⚠️ Confirmação de Exclusão", expanded=True):
-                                        st.warning(f"Tem certeza que deseja excluir **{produto_selecionado['nome']}**?")
-                                        col_confirmar, col_voltar = st.columns(2)
-                                        with col_confirmar:
-                                            if st.button("✅ Sim, Excluir", type="primary", key="confirmar_exclusao"):
-                                                try:
-                                                    resultado = produto_service.excluir_produto(produto_selecionado['id'])
-                                                    if resultado:
-                                                        st.success("✅ Produto excluído com sucesso!")
-                                                        st.session_state.produtos_edicao = None
-                                                        st.session_state.produto_selecionado_id = None
-                                                        st.rerun()
-                                                    else:
-                                                        st.error("❌ Erro ao excluir produto")
-                                                except Exception as e:
-                                                    st.error(f"❌ Erro: {e}")
-                                        with col_voltar:
-                                            if st.button("↩️ Cancelar", key="cancelar_exclusao"):
-                                                st.rerun()
-                            
-                            with col_cancelar:
-                                if st.button("🔄 Recarregar Lista", key="recarregar_lista"):
-                                    st.session_state.produtos_edicao = None
-                                    st.session_state.produto_selecionado_id = None
-                                    st.rerun()
+                            # Processa EXCLUIR
+                            if submitted_delete:
+                                try:
+                                    resultado = produto_service.excluir_produto(produto_selecionado['id'])
+                                    if resultado:
+                                        st.success("✅ Produto excluído com sucesso!")
+                                        st.session_state.produtos_edicao = None
+                                        st.session_state.produto_selecionado_id = None
+                                        st.rerun()
+                                    else:
+                                        st.error("❌ Erro ao excluir produto")
+                                except Exception as e:
+                                    st.error(f"❌ Erro: {e}")
                 else:
                     st.info("📝 Nenhum produto cadastrado para editar")
                     
@@ -325,6 +314,8 @@ with tab4:
                 st.error(f"❌ Erro ao carregar produtos: {e}")
         else:
             st.info("👆 Clique no botão para carregar os produtos")
+                                        
+                                        
 
 # ========== NAVEGAÇÃO ==========
 st.divider()
