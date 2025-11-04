@@ -110,13 +110,20 @@ with tab1:
     if st.button("🔄 Carregar Vendas", key="carregar_vendas"):
         try:
             vendas = venda_service.listar_vendas()
+            
+            # DEBUG: Mostrar o que veio da API
+            st.write("🔍 Debug - Dados brutos da API:", vendas)
+            
             if vendas and len(vendas) > 0:
                 # Formatar dados para exibição
                 vendas_formatadas = []
                 for venda in vendas:
+                    st.write(f"🔍 Debug - Venda individual:", venda)  # Mostra cada venda
+                    
                     # Buscar nome do cliente
                     cliente_nome = "Cliente não encontrado"
-                    for cliente in cliente_service.listar_clientes():
+                    clientes_lista = cliente_service.listar_clientes()
+                    for cliente in clientes_lista:
                         if cliente['id'] == venda['cliente_id']:
                             cliente_nome = cliente['nome']
                             break
