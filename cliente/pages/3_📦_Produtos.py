@@ -283,26 +283,25 @@ with tab4:
                                         )
                                         if resultado:
                                             st.success("✅ Produto atualizado com sucesso!")
-                                            # Limpa o cache para recarregar dados atualizados
+                                            # Marca para recarregar na próxima interação
                                             st.session_state.produtos_edicao = None
                                             st.session_state.produto_selecionado_id = None
-                                            st.rerun()
                                         else:
                                             st.error("❌ Erro ao atualizar produto")
                                     except Exception as e:
                                         st.error(f"❌ Erro: {e}")
                                 else:
                                     st.error("❌ Nome é obrigatório!")
-                            
+
                             # Processa EXCLUIR
                             if submitted_delete:
                                 try:
                                     resultado = produto_service.excluir_produto(produto_selecionado['id'])
                                     if resultado:
                                         st.success("✅ Produto excluído com sucesso!")
+                                        # Marca para recarregar na próxima interação
                                         st.session_state.produtos_edicao = None
                                         st.session_state.produto_selecionado_id = None
-                                        st.rerun()
                                     else:
                                         st.error("❌ Erro ao excluir produto")
                                 except Exception as e:

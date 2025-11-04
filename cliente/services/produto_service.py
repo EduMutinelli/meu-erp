@@ -47,9 +47,7 @@ class ProdutoService:
     
     def excluir_produto(self, produto_id):
         try:
-            st.write(f"🔍 Debug - Tentando excluir produto ID: {produto_id}")
             resultado = self.api.delete(f"/produtos/{produto_id}")
-            st.write(f"🔍 Debug - Resposta da exclusão: {resultado}")
             return resultado
         except Exception as e:
             st.error(f"❌ Erro ao excluir produto: {e}")
