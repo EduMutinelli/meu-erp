@@ -23,20 +23,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Adicione ANTES de registrar as rotas
-print("🟢 DEBUG: Antes de registrar rotas")
 
 # Registrar rotas
 app.include_router(clientes_router, prefix="/api/v1")
 app.include_router(produtos_router, prefix="/api/v1") 
 app.include_router(vendas_router, prefix="/api/v1")
 
-# Adicione DEPOIS de registrar as rotas
-print("🟢 DEBUG: Depois de registrar rotas")
-for route in app.routes:
-    if hasattr(route, "methods") and hasattr(route, "path"):
-        print(f"   {list(route.methods)} {route.path}")
-        
+
 @app.get("/")
 def root():
     return {"message": "ERP API Online!", "version": "1.0.0"}

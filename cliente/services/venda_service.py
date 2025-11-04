@@ -10,12 +10,11 @@ class VendaService:
         return self.api.post("/vendas/", venda_data)
     
     def listar_vendas(self):
-        response = self.api.get("/vendas/")
-        print(f"🔍 [VENDA SERVICE] Resposta da API: {response}")
-        if response and "vendas" in response:
-            vendas = response["vendas"]
-            return vendas if isinstance(vendas, list) else []
-        return []
+        resultado = self.api.get("/vendas/")
+        if resultado and 'vendas' in resultado:
+            return resultado['vendas']
+        else:
+            return []
     
     def listar_itens_venda(self, venda_id):
         response = self.api.get(f"/vendas/{venda_id}/itens")

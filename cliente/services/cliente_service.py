@@ -31,7 +31,7 @@ class ClienteService:
     
     def desativar_cliente(self, cliente_id):
         try:
-            resultado = self.api.put(f"/clientes/{cliente_id}/desativar")
+            resultado = self.api.put(f"/clientes/{cliente_id}/desativar", {})
             return resultado
         except Exception as e:
             st.error(f"❌ Erro ao desativar cliente: {e}")

@@ -10,23 +10,12 @@ class APIClient:
     def _request(self, method, endpoint, **kwargs):
         try:
             url = f"{self.base_url}{endpoint}"
-            st.write(f"🔍 Debug COMPLETO - API Client:")
-            st.write(f"   Base URL: {self.base_url}")
-            st.write(f"   Endpoint: {endpoint}")
-            st.write(f"   URL Final: {method} {url}")
-            st.write(f"   Headers: {kwargs.get('headers', {})}")
-            
             response = requests.request(method, url, **kwargs)
-            
-            st.write(f"🔍 Debug RESPONSE:")
-            st.write(f"   Status Code: {response.status_code}")
-            st.write(f"   Response Text: {response.text}")
-            st.write(f"   Response Headers: {dict(response.headers)}")
             
             if response.status_code == 200:
                 return response.json()
             else:
-                st.error(f"Erro na API: {response.status_code} - {response.text}")
+                st.error(f"Erro na API: {response.status_code}")
                 return None
                 
         except requests.exceptions.ConnectionError:
