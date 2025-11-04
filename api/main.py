@@ -23,6 +23,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def startup_event():
+    print("🟢 ROTAS REGISTRADAS:")
+    for route in app.routes:
+        if hasattr(route, "methods") and hasattr(route, "path"):
+            print(f"   {list(route.methods)} {route.path}")
 
 # Registrar rotas
 app.include_router(clientes_router, prefix="/api/v1")
