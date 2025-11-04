@@ -111,33 +111,31 @@ with tab1:
         try:
             vendas = venda_service.listar_vendas()
             
-            # DEBUG: Mostrar o que veio da API
-            st.write("🔍 Debug - Dados brutos da API:", vendas)
-            
             if vendas and len(vendas) > 0:
                 # Formatar dados para exibição
                 vendas_formatadas = []
                 for venda in vendas:
-                    st.write(f"🔍 Debug - Venda individual:", venda)  # Mostra cada venda
-                    
-                    # Buscar nome do cliente
-                    cliente_nome = "Cliente não encontrado"
-                    clientes_lista = cliente_service.listar_clientes()
-                    for cliente in clientes_lista:
-                        if cliente['id'] == venda['cliente_id']:
-                            cliente_nome = cliente['nome']
-                            break
-                    
                     vendas_formatadas.append({
                         "ID": venda['id'],
-                        "Cliente": cliente_nome,
-                        "Data": venda['data_venda'][:10] if 'data_venda' in venda else 'N/A',
-                        "Total": f"R$ {venda.get('valor_total', 0):.2f}",
-                        "Itens": len([item for item in venda.get('itens', [])]) if 'itens' in venda else 1
+                        "Cliente": venda.get('cliente_nome', 'N/A'),
+                        "Data": venda['data_venda'][:10],  # Pega apenas a data (YYYY-MM-DD)
+                        "Total": f"R$ {float(venda.get('total', 0)):.2f}",  # Converte string para float
+                        "Observação": venda.get('observacao', '') or '-'
                     })
                 
                 st.dataframe(vendas_formatadas, width='stretch')
                 st.success(f"✅ {len(vendas)} vendas encontradas")
+                
+                # Mostrar estatísticas
+                col1, col2, col3 = st.columns(3)
+                total_geral = sum(float(venda.get('total', 0)) for venda in vendas)
+                
+                with col1:
+                    st.metric("Total de Vendas", len(vendas))
+                with col2:
+                    st.metric("Valor Total", f"R$ {total_geral:.2f}")
+                with col3:
+                    st.metric("Ticket Médio", f"R$ {total_geral/len(vendas):.2f}")
                 
             else:
                 st.info("📝 Nenhuma venda registrada no momento")
