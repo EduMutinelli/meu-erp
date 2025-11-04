@@ -1,5 +1,6 @@
 import streamlit as st
 from services.local_service import LocalClienteService, LocalProdutoService, LocalVendaService
+from utils.permissions import can_access, can_edit, can_delete, can_create
 
 cliente_service = LocalClienteService()
 produto_service = LocalProdutoService() 
@@ -42,27 +43,53 @@ with st.sidebar:
     
     st.subheader("🧭 Navegação")
     
-    if st.button("📊 Dashboard", use_container_width=True, type="primary"):
-        st.rerun()
+    # Menu baseado nas permissões - APENAS mostre o que o usuário pode acessar
+    if st.button("📊 Dashboard", use_container_width=True):
+        st.switch_page("pages/1_🏠_Dashboard.py")
     
-    if st.button("👥 Clientes", use_container_width=True):
-        st.switch_page("./pages/2_👥_Clientes.py")
+    # 👥 CLIENTES - só mostra se tiver permissão
+    if can_access(st.session_state.cargo, 'clientes'):
+        if st.button("👥 Clientes", use_container_width=True):
+            st.switch_page("pages/2_👥_Clientes.py")
     
-    if st.button("📦 Produtos", use_container_width=True):
-        st.switch_page("./pages/3_📦_Produtos.py")
+    # 📦 PRODUTOS - só mostra se tiver permissão
+    if can_access(st.session_state.cargo, 'produtos'):
+        if st.button("📦 Produtos", use_container_width=True):
+            st.switch_page("pages/3_📦_Produtos.py")
     
-    if st.button("💰 Vendas", use_container_width=True):
-        st.switch_page("./pages/4_💰_Vendas.py")
+    # 💰 VENDAS - só mostra se tiver permissão
+    if can_access(st.session_state.cargo, 'vendas'):
+        # Verifica se está na página atual para usar type="primary"
+        current_page = st.query_params.get("page", "1_🏠_Dashboard")
+        is_current = current_page == "4_💰_Vendas"
+        
+        if st.button("💰 Vendas", use_container_width=True, type="primary" if is_current else "secondary"):
+            st.switch_page("pages/4_💰_Vendas.py")
     
-    if st.button("💸 Financeiro", use_container_width=True):
-        st.switch_page("./pages/5_💸_Financeiro.py")
+    # 💸 FINANCEIRO - só mostra se tiver permissão
+    if can_access(st.session_state.cargo, 'financeiro'):
+        current_page = st.query_params.get("page", "1_🏠_Dashboard")
+        is_current = current_page == "5_💸_Financeiro"
+        
+        if st.button("💸 Financeiro", use_container_width=True, type="primary" if is_current else "secondary"):
+            st.switch_page("pages/5_💸_Financeiro.py")
     
-    if st.button("📋 Fiscal", use_container_width=True):
-        st.switch_page("./pages/6_📋_Fiscal.py")
+    # 📋 FISCAL - só mostra se tiver permissão
+    if can_access(st.session_state.cargo, 'fiscal'):
+        current_page = st.query_params.get("page", "1_🏠_Dashboard")
+        is_current = current_page == "6_📋_Fiscal"
+        
+        if st.button("📋 Fiscal", use_container_width=True, type="primary" if is_current else "secondary"):
+            st.switch_page("pages/6_📋_Fiscal.py")
     
-    if st.button("⚙️ Configurações", use_container_width=True):
-        st.switch_page("./pages/7_⚙️_Configurações.py")
-
+    # ⚙️ CONFIGURAÇÕES - só mostra se tiver permissão
+    if can_access(st.session_state.cargo, 'configuracoes'):
+        current_page = st.query_params.get("page", "1_🏠_Dashboard")
+        is_current = current_page == "7_⚙️_Configurações"
+        
+        if st.button("⚙️ Configurações", use_container_width=True, type="primary" if is_current else "secondary"):
+            st.switch_page("pages/7_⚙️_Configurações.py")
+    
     st.divider()
 
 # ========== CONTEÚDO ==========
