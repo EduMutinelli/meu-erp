@@ -163,12 +163,12 @@ with tab1:
                     col1, col2 = st.columns(2)
                     
                     with col1:
-                        if st.button("🗑️", type="secondary", help="Excluir"):
-                            st.warning("Esta ação irá deletar")
+                        if st.button("🗑️", key=f"excluir_{registro['ID']}", type="secondary", help="Excluir"):
+                            st.warning(f"Esta ação irá deletar o registro {registro['ID']}")
                             # Implementar lógica de delete aqui
                             
                     with col2:
-                        if st.button("📊", type="secondary", help="Resetar estatísticas"):
+                        if st.button("📊", key=f"resetar_{registro['ID']}", type="secondary", help="Resetar estatísticas"):
                             st.info("Estatísticas resetadas")
                             st.rerun()
         
