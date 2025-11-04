@@ -157,20 +157,6 @@ with tab1:
             with col5:
                 st.write(f"R$ {registro['valor']:,.2f}")
             
-            with col6:
-
-                if can_delete(st.session_state.cargo, 'financeiro'):  
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        if st.button("🗑️", key=f"excluir_{registro['ID']}", type="secondary", help="Excluir"):
-                            st.warning(f"Esta ação irá deletar o registro {registro['ID']}")
-                            # Implementar lógica de delete aqui
-                            
-                    with col2:
-                        if st.button("📊", key=f"resetar_{registro['ID']}", type="secondary", help="Resetar estatísticas"):
-                            st.info("Estatísticas resetadas")
-                            st.rerun()
         
         # Total filtrado
         total_filtrado = sum(r['valor'] for r in registros_filtrados if r['tipo'] == 'RECEITA') - \

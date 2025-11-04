@@ -149,21 +149,6 @@ with tab1:
             
             with col4:
                 st.write(f"R$ {registro['valor']:,.2f}")
-            
-            with col5:
-
-                if can_delete(st.session_state.cargo, 'fiscal'):  
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        if st.button("🗑️", type="secondary", help="Excluir"):
-                            st.warning("Esta ação irá deletar")
-                            # Implementar lógica de delete aqui
-                            
-                    with col2:
-                        if st.button("📊", type="secondary", help="Resetar estatísticas"):
-                            st.info("Estatísticas resetadas")
-                            st.rerun()
            
         # Totais
         total_entradas_filtro = sum(r['valor'] for r in registros_filtrados if r['tipo'] == 'ENTRADA')
