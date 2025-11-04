@@ -29,12 +29,10 @@ class ClienteService:
             st.error(f"❌ Erro ao atualizar cliente: {e}")
             return None
     
-    def desativar_cliente(self, cliente_id):
+    def excluir_cliente(self, cliente_id):
         try:
-            st.write(f"🔍 Debug Service - Chamando PUT para cliente {cliente_id}")
-            resultado = self.api.put(f"/clientes/{cliente_id}/desativar", {})
-            st.write(f"🔍 Debug Service - Resultado: {resultado}")
+            resultado = self.api.delete(f"/clientes/{cliente_id}")
             return resultado
         except Exception as e:
-            st.error(f"❌ Erro ao desativar cliente: {e}")
+            st.error(f"❌ Erro ao excluir cliente: {e}")
             return None
