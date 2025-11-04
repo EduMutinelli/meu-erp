@@ -204,9 +204,9 @@ with tab3:
                         
                         with col_btn2:
                             if can_delete(st.session_state.cargo, 'clientes'):
-                                if st.form_submit_button("🗑️ Excluir Cliente", type="secondary"):
+                                if st.form_submit_button("Desativar Cliente", type="secondary"):
                                     try:
-                                        resultado = cliente_service.excluir_cliente(cliente_selecionado['id'])
+                                        resultado = cliente_service.desativar_cliente(cliente_selecionado['id'])
                                         if resultado:
                                             st.success("✅ Cliente excluído com sucesso!")
                                             st.rerun()

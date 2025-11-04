@@ -66,11 +66,15 @@ async def atualizar_cliente(cliente_id: int, cliente: Cliente):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
     
-@router.post("/{cliente_id}/delete", response_model=dict)
-async def excluir_cliente(cliente_id: int):
+@router.put("/{cliente_id}/desativar", response_model=dict)
+async def desativar_cliente(cliente_id: int):
     try:
-        query = "DELETE FROM clientes WHERE id = %s"
-        db.execute_query(query, (cliente_id,))
-        return {"message": "Cliente excluído com sucesso"}
+        query = "UPDATE clientes SET ativo = false WHERE id = %s"
+        result = db.execute_query(query, (cliente_id,))
+        
+        if result is not None:
+            return {"message": "Cliente desativado com sucesso"}
+        else:
+            raise HTTPException(status_code=500, detail="Falha ao desativar cliente")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
