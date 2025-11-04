@@ -29,9 +29,17 @@ class ClienteService:
             st.error(f"❌ Erro ao atualizar cliente: {e}")
             return None
     
-    def excluir_cliente(self, cliente_id):  
+    def excluir_cliente(self, cliente_id):
         try:
-            resultado = self.api.delete(f"/clientes/{cliente_id}")
+            # Marca como inativo em vez de deletar
+            cliente_data = {
+                "nome": "Cliente Excluído", 
+                "email": "excluido@exemplo.com",
+                "telefone": "000000000", 
+                "endereco": "EXCLUIDO",
+                "ativo": False
+            }
+            resultado = self.api.put(f"/clientes/{cliente_id}", cliente_data)
             return resultado
         except Exception as e:
             st.error(f"❌ Erro ao excluir cliente: {e}")
