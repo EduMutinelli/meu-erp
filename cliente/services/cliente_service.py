@@ -22,12 +22,6 @@ class ClienteService:
         return response.get("cliente") if response else None
     
     def atualizar_cliente(self, cliente_id, cliente_data):
-        return self.api.put(f"/clientes/{cliente_id}", cliente_data)
-    
-    def excluir_cliente(self, cliente_id):
-        return self.api.delete(f"/clientes/{cliente_id}")
-    
-    def atualizar_cliente(self, cliente_id, cliente_data):
         try:
             resultado = self.api.put(f"/clientes/{cliente_id}", cliente_data)
             return resultado
@@ -37,10 +31,10 @@ class ClienteService:
     
     def excluir_cliente(self, cliente_id):
         try:
+            st.write(f"🔍 Debug - Tentando excluir cliente ID: {cliente_id}")
             resultado = self.api.delete(f"/clientes/{cliente_id}")
+            st.write(f"🔍 Debug - Resposta da exclusão: {resultado}")
             return resultado
         except Exception as e:
             st.error(f"❌ Erro ao excluir cliente: {e}")
             return None
-        
-        
