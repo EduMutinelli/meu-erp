@@ -29,10 +29,12 @@ class ClienteService:
             st.error(f"❌ Erro ao atualizar cliente: {e}")
             return None
     
-    def excluir_cliente(self, cliente_id):
+    def excluir_cliente(self, cliente_id):  
         try:
             resultado = self.api.delete(f"/clientes/{cliente_id}")
             return resultado
         except Exception as e:
             st.error(f"❌ Erro ao excluir cliente: {e}")
             return None
+    
+   
