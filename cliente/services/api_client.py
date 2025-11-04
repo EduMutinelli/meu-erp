@@ -12,6 +12,7 @@ class APIClient:
             url = f"{self.base_url}{endpoint}"
             st.write(f"🔍 Debug - Chamando: {method} {url}")  # ← Adicione esta linha
             response = requests.request(method, url, **kwargs)
+            st.write(f"🔍 Debug - Status: {response.status_code}")  # ← E o status
             
             if response.status_code == 200:
                 return response.json()
@@ -32,7 +33,7 @@ class APIClient:
     def post(self, endpoint, data):
         return self._request("POST", endpoint, json=data)
     
-    def put(self, endpoint, data):
+    def put(self, endpoint, data=None):
         return self._request("PUT", endpoint, json=data)
     
     def delete(self, endpoint):
