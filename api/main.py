@@ -23,13 +23,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.on_event("startup")
-async def startup_event():
-    print("🟢 ROTAS REGISTRADAS:")
-    for route in app.routes:
-        if hasattr(route, "methods") and hasattr(route, "path"):
-            print(f"   {list(route.methods)} {route.path}")
-
 # Registrar rotas
 app.include_router(clientes_router, prefix="/api/v1")
 app.include_router(produtos_router, prefix="/api/v1") 
@@ -43,6 +36,18 @@ def root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "service": "ERP API"}
+
+print("\n" + "="*50)
+print("🟢 TODAS AS ROTAS REGISTRADAS:")
+print("="*50)
+
+for route in app.routes:
+    if hasattr(route, "methods") and hasattr(route, "path"):
+        methods = list(route.methods)
+        path = route.path
+        print(f"   {methods} {path}")
+
+print("="*50)
 
 if __name__ == "__main__":
     import uvicorn
