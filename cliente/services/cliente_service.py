@@ -30,11 +30,4 @@ class ClienteService:
             return None
     
     def excluir_cliente(self, cliente_id):
-        try:
-            st.write(f"🔍 Debug - Tentando excluir cliente ID: {cliente_id}")
-            resultado = self.api.delete(f"/clientes/{cliente_id}")
-            st.write(f"🔍 Debug - Resposta da exclusão: {resultado}")
-            return resultado
-        except Exception as e:
-            st.error(f"❌ Erro ao excluir cliente: {e}")
-            return None
+        return self.api.post(f"/clientes/{cliente_id}/delete")

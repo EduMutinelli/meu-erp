@@ -66,7 +66,7 @@ async def atualizar_cliente(cliente_id: int, cliente: Cliente):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
     
-@router.delete("/{cliente_id}", response_model=dict)
+@router.post("/{cliente_id}/delete", response_model=dict)
 async def excluir_cliente(cliente_id: int):
     try:
         query = "DELETE FROM clientes WHERE id = %s"
