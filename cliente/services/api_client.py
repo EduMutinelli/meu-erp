@@ -10,6 +10,7 @@ class APIClient:
     def _request(self, method, endpoint, **kwargs):
         try:
             url = f"{self.base_url}{endpoint}"
+            st.write(f"🔍 Debug - Chamando: {method} {url}")  # ← Adicione esta linha
             response = requests.request(method, url, **kwargs)
             
             if response.status_code == 200:

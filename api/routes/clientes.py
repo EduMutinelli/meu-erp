@@ -69,7 +69,7 @@ async def atualizar_cliente(cliente_id: int, cliente: Cliente):
 @router.put("/{cliente_id}/desativar", response_model=dict)
 async def desativar_cliente(cliente_id: int):
     try:
-        query = "SELECT * FROM clientes WHERE ativo = true ORDER BY data_cadastro DESC"
+        query = "UPDATE clientes SET ativo = false WHERE id = %s"
         result = db.execute_query(query, (cliente_id,))
         
         if result is not None:
