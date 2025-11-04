@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException
 from database import Database
 from models.cliente_model import Cliente
 
-router = APIRouter(prefix="/clientes", tags=["Clientes"])
+router = APIRouter(tags=["Clientes"])
 db = Database()
 
 @router.post("/", response_model=dict)

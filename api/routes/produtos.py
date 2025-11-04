@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from database import Database
 from models.produto_model import Produto
 
-router = APIRouter(prefix="/produtos", tags=["Produtos"])
+router = APIRouter(tags=["Produtos"])
 db = Database()
 
 @router.post("/", response_model=dict)
